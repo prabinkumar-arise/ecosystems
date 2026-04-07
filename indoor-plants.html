@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ECOGROW - Expert Advice by Prabin</title>
+    <style>
+        :root {
+            --accent-green: #74c69d;
+            --glass: rgba(255, 255, 255, 0.08);
+            --border: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            margin: 0; padding: 0;
+            background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('logo43.jpg'); 
+            background-size: cover; background-position: center; background-attachment: fixed;
+            background-color: #0b1c0b; font-family: 'Segoe UI', Tahoma, sans-serif;
+            color: white; min-height: 100vh; overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+            perspective: 1200px;
+        }
+
+        /* --- 3D ENTRANCE ANIMATIONS --- */
+        @keyframes headerDrop3D {
+            0% { opacity: 0; transform: translateY(-80px) rotateX(-40deg) scale(0.8); }
+            100% { opacity: 1; transform: translateY(0) rotateX(0) scale(1); }
+        }
+
+        @keyframes cardPop3D {
+            0% { opacity: 0; transform: translateY(100px) translateZ(-200px) rotateX(30deg) scale(0.8); }
+            100% { opacity: 1; transform: translateY(0) translateZ(0) rotateX(0) scale(1); }
+        }
+
+        /* --- NAVIGATION & FLOATING EAGLE (MOBILE FIRST) --- */
+        .nav-container { position: fixed; top: 15px; right: 15px; z-index: 4000; display: flex; align-items: center; }
+        
+        @keyframes floatUpDown {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+            100% { transform: translateY(0); }
+        }
+
+        .eagle-trigger { 
+            font-size: 35px; /* Scaled down for mobile */
+            cursor: pointer; 
+            filter: drop-shadow(0 4px 10px rgba(0,0,0,0.5)); 
+            transition: transform 0.5s;
+            animation: floatUpDown 3s ease-in-out infinite; 
+        }
+        .eagle-trigger:hover { transform: scale(1.1) rotate(10deg); }
+
+        .eagle-bubble-nav {
+            background: #ffffff;
+            color: #1b4332;
+            padding: 6px 10px;
+            border-radius: 12px;
+            font-size: 11px; /* Smaller for mobile */
+            font-weight: bold;
+            text-align: center;
+            width: 120px;
+            border: 2px solid #e9c46a;
+            margin-right: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            position: relative;
+            animation: floatUpDown 3s ease-in-out infinite; 
+            pointer-events: none;
+        }
+
+        .eagle-bubble-nav::after {
+            content: ''; position: absolute; top: 50%; right: -8px; transform: translateY(-50%);
+            border-width: 6px 0 6px 6px; border-style: solid; border-color: transparent transparent transparent #e9c46a;
+            display: block; width: 0;
+        }
+        
+        #eagle-menu {
+            position: absolute; top: 45px; right: 0;
+            background: rgba(15, 35, 15, 0.98); backdrop-filter: blur(15px);
+            border: 1px solid var(--border); border-radius: 15px;
+            padding: 8px; width: 180px; display: none; box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+            transform-origin: top right;
+            animation: fadeInScale 0.3s ease-out;
+        }
+        @keyframes fadeInScale {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        #eagle-menu.show { display: block; }
+        .menu-item {
+            display: block; color: white; text-decoration: none;
+            padding: 10px; margin: 5px 0; border-radius: 10px;
+            font-weight: 600; font-size: 14px; transition: background 0.4s;
+            cursor: pointer;
+        }
+        .menu-item:hover { background: var(--glass); color: var(--accent-green); }
+
+        /* --- HEADER --- */
+        header { 
+            text-align: center; padding: 60px 10px 15px 10px; 
+            animation: headerDrop3D 2.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+        }
+        h1 { font-size: 1.8rem; color: var(--accent-green); margin: 0; text-shadow: 0 4px 15px rgba(0,0,0,0.8); }
+        .subtitle { font-size: 0.9rem; opacity: 0.9; margin-top: 5px; }
+
+        /* --- PLANT GRID --- */
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 10px 160px 10px; perspective: 1000px; }
+        .plant-grid { 
+            display: grid; 
+            /* Optimized to force 2 columns on most phones without breaking */
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); 
+            gap: 12px; 
+        }
+
+        .plant-card {
+            background: var(--glass); backdrop-filter: blur(12px);
+            border-radius: 15px; overflow: hidden; border: 1px solid var(--border);
+            transition: all 0.5s ease; cursor: pointer; display: flex; flex-direction: column;
+            opacity: 0; transform-style: preserve-3d;
+            animation: cardPop3D 1.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+        }
+        
+        .plant-card:nth-child(1) { animation-delay: 0.3s; }
+        .plant-card:nth-child(2) { animation-delay: 0.6s; }
+        .plant-card:nth-child(3) { animation-delay: 0.9s; }
+        .plant-card:nth-child(4) { animation-delay: 1.2s; }
+
+        .plant-card:active { transform: scale(0.95); border-color: var(--accent-green); }
+        
+        .plant-photo { width: 100%; height: 140px; object-fit: cover; }
+        .plant-info { padding: 8px; text-align: center; background: linear-gradient(transparent, rgba(0,0,0,0.8)); }
+        .plant-card h3 { color: white; margin: 0; font-size: 14px; text-shadow: 0 2px 5px rgba(0,0,0,0.8); }
+
+        /* --- CHARACTER ANIMATION (FIXED TO BOTTOM FOR MOBILE) --- */
+        #character-container {
+            position: fixed; /* Keeps him on screen while scrolling */
+            bottom: 15px; 
+            left: -400px; 
+            display: flex; 
+            flex-direction: row; 
+            align-items: flex-end; 
+            z-index: 5000;
+            pointer-events: none; 
+            width: 100%; /* Prevents horizontal scrollbar issues */
+            transition: left 2.5s cubic-bezier(0.25, 1, 0.5, 1); 
+        }
+        
+        #character-container.arrived { left: 10px; }
+        #character-container.exit { left: 120vw !important; transition: left 3s ease-in !important; }
+
+        .boy-emoji { 
+            font-size: 60px; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.5)); 
+            pointer-events: auto; transform-origin: bottom; margin-right: 10px; 
+        }
+        
+        .speech-bubble {
+            background: #ffffff; color: #1b4332; padding: 12px; border-radius: 15px;
+            font-size: 13px; width: 60vw; max-width: 220px; max-height: 200px; overflow-y: auto;
+            opacity: 0; transform: scale(0.8) translateX(-20px);
+            border: 2px solid var(--accent-green); transition: all 0.4s ease;
+            pointer-events: auto; 
+            margin-bottom: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+            position: relative;
+        }
+
+        .speech-bubble::after {
+            content: ''; position: absolute; bottom: 20px; left: -10px;
+            border-width: 8px 10px 8px 0; border-style: solid; border-color: transparent var(--accent-green) transparent transparent;
+            display: block; width: 0;
+        }
+
+        #character-container.speaking .speech-bubble { opacity: 1; transform: scale(1) translateX(0); }
+
+        .plant-name { color: #1b4332; font-weight: 800; border-bottom: 2px solid var(--accent-green); display: block; padding-bottom: 3px; font-size: 14px;}
+        .tip-title { color: #2d6a4f; font-weight: 800; text-transform: uppercase; font-size: 10px; margin-top: 8px; display: block; }
+
+        /* --- DESKTOP ADJUSTMENTS --- */
+        @media (min-width: 768px) {
+            h1 { font-size: 3rem; }
+            .subtitle { font-size: 1.2rem; }
+            .nav-container { top: 25px; right: 30px; }
+            .eagle-trigger { font-size: 45px; }
+            .eagle-bubble-nav { font-size: 14px; width: 160px; padding: 10px 15px; }
+            #eagle-menu { top: 60px; width: 220px; }
+            .menu-item { font-size: 16px; }
+
+            .plant-grid { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 25px; }
+            .plant-card:hover { transform: translateY(-10px) translateZ(30px) rotateX(5deg); box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
+            .plant-photo { height: 250px; }
+            .plant-card h3 { font-size: 18px; }
+
+            /* Switch character back to absolute positioning for larger screens if desired, 
+               or keep fixed but larger. We'll keep him fixed but larger for a modern feel. */
+            #character-container { bottom: 30px; }
+            #character-container.arrived { left: 30px; }
+            .boy-emoji { font-size: 90px; margin-right: 20px; }
+            .boy-emoji:hover { transform: scale(1.1) rotate(-5deg); }
+            .speech-bubble { max-width: 300px; font-size: 15px; padding: 15px; border-radius: 20px;}
+            .plant-name { font-size: 16px; }
+            .tip-title { font-size: 12px; }
+        }
+    </style>
+</head>
+<body onclick="handleFirstClick()" ontouchstart="handleFirstClick()">
+
+    <div class="nav-container">
+        <div class="eagle-bubble-nav" id="eagleBubbleNav">I am an eagle!<br>Click me for the next part! 🦅</div>
+        <div class="eagle-trigger" onclick="toggleMenu(event)">🦅</div>
+        
+        <div id="eagle-menu">
+            <a onclick="exitTo('index4.html', 'home')" class="menu-item">🏠 Home</a>
+            <a onclick="exitTo('outdoor-plants.html', 'next')" class="menu-item">🌳 Outdoor Plants</a>
+            <a onclick="exitTo('meditation-plants.html', 'next')" class="menu-item">🧘 Meditation</a>
+        </div>
+    </div>
+
+    <header>
+        <h1>🏠 INDOOR PLANTS</h1>
+        <p class="subtitle">Vastu, Health & Growth Tips </p>
+    </header>
+
+    <div class="container">
+        <div class="plant-grid">
+            <div class="plant-card" onclick="explain('tulsi')">
+                <img src="logo51.jpg" alt="Tulsi" class="plant-photo">
+                <div class="plant-info"><h3>Tulsi</h3></div>
+            </div>
+            <div class="plant-card" onclick="explain('money')">
+                <img src="logo52.jpg" alt="Money Plant" class="plant-photo">
+                <div class="plant-info"><h3>Money Plant</h3></div>
+            </div>
+            <div class="plant-card" onclick="explain('areca')">
+                <img src="logo50.jpg" alt="Areca Palm" class="plant-photo">
+                <div class="plant-info"><h3>Areca Palm</h3></div>
+            </div>
+            <div class="plant-card" onclick="explain('aloe')">
+                <img src="a1.jpg" alt="Aloe Vera" class="plant-photo">
+                <div class="plant-info"><h3>Aloe Vera</h3></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="character-container">
+        <div class="boy-emoji">🧍🏻‍♂️</div>
+        <div id="speechBubble" class="speech-bubble"></div>
+    </div>
+
+    <script>
+        let hasInteracted = false;
+        const boyContainer = document.getElementById('character-container');
+        const bubble = document.getElementById('speechBubble');
+        const eagleBubbleNav = document.getElementById('eagleBubbleNav');
+        let typeTimer;
+
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                boyContainer.classList.add('arrived');
+            }, 500);
+
+            setTimeout(() => {
+                if (!hasInteracted) {
+                    hasInteracted = true;
+                    explain('greeting');
+                }
+            }, 4000); 
+        });
+
+        function toggleMenu(e) { 
+            e.stopPropagation();
+            document.getElementById('eagle-menu').classList.toggle('show'); 
+            
+            if(document.getElementById('eagle-menu').classList.contains('show')) {
+                eagleBubbleNav.style.opacity = '0';
+                eagleBubbleNav.style.transition = 'opacity 0.2s ease';
+            } else {
+                eagleBubbleNav.style.opacity = '1';
+            }
+        }
+
+        function stopEverything() {
+            window.speechSynthesis.cancel();
+            clearTimeout(typeTimer);
+            boyContainer.classList.remove('speaking');
+        }
+
+        document.addEventListener("visibilitychange", () => {
+            if (document.hidden) stopEverything();
+        });
+
+        function exitTo(url, type) {
+            stopEverything(); 
+            document.getElementById('eagle-menu').classList.remove('show'); 
+            eagleBubbleNav.style.display = 'none'; // Hide permanently on exit
+            
+            let exitMessage = "";
+            if (type === 'home') {
+                exitMessage = "<span class='plant-name'>Thank you for visiting!</span> 🙏 See you again soon.";
+            } else if (type === 'next') {
+                exitMessage = "<span class='plant-name'>Great choice!</span> 🚶‍♂️ Ok, I will show you the next part...";
+            }
+
+            bubble.innerHTML = "";
+            boyContainer.classList.add('speaking');
+            let index = 0;
+            speakText(exitMessage);
+
+            function typeWriter() {
+                if (index <= exitMessage.length) {
+                    bubble.innerHTML = exitMessage.substring(0, index);
+                    index++;
+                    
+                    // Auto-scroll logic for mobile bubble
+                    bubble.scrollTop = bubble.scrollHeight;
+                    typeTimer = setTimeout(typeWriter, 30); 
+                }
+            }
+            typeWriter();
+
+            setTimeout(() => { 
+                boyContainer.classList.add('exit');
+                setTimeout(() => {
+                    window.location.href = url; 
+                }, 3500); // Slightly faster exit for better mobile feel
+            }, 2500); 
+        }
+
+        const plantFacts = {
+            'greeting': '<span class="plant-name">Namaste!</span> . Tap any plant to hear my expert advice!',
+            'tulsi': '<span class="plant-name">Tulsi 🌿</span><span class="tip-title">✨ Vastu</span> Best in North/East.<br><span class="tip-title">💊 Health</span> Great for immunity.<br><span class="tip-title">☀️ Care</span> 6-8 hrs sunlight.',
+            'money': '<span class="plant-name">Money Plant 🍃</span><span class="tip-title">✨ Vastu</span> South-East for wealth.<br><span class="tip-title">💊 Health</span> Purifies air.<br><span class="tip-title">💧 Growth</span> Change water weekly!',
+            'areca': '<span class="plant-name">Areca Palm 🌴</span><span class="tip-title">✨ Vastu</span> South-West for peace.<br><span class="tip-title">💊 Health</span> Natural humidifier.<br><span class="tip-title">🌱 Soil</span> Prefers acidic soil.',
+            'aloe': '<span class="plant-name">Aloe Vera 🌵</span><span class="tip-title">✨ Vastu</span> North or East placement.<br><span class="tip-title">💊 Health</span> Nighttime oxygen.<br><span class="tip-title">🏜️ Watering</span> Let soil dry completely.'
+        };
+
+        function handleFirstClick() {
+            if (!hasInteracted && boyContainer.classList.contains('arrived')) {
+                hasInteracted = true;
+                explain('greeting');
+            }
+        }
+
+        function speakText(htmlText) {
+            window.speechSynthesis.cancel(); 
+            let cleanText = htmlText.replace(/<\/?[^>]+(>|$)/g, " ").replace(/Namaste/gi, "Nuh-mush-tay"); 
+
+            const utterance = new SpeechSynthesisUtterance(cleanText);
+            utterance.rate = 0.95; // Slightly faster for mobile
+            
+            const voices = window.speechSynthesis.getVoices();
+            const indVoice = voices.find(v => v.lang.includes('en-IN') || v.name.includes('India'));
+            if (indVoice) utterance.voice = indVoice;
+
+            utterance.onend = () => {
+                setTimeout(() => { 
+                    if(!window.speechSynthesis.speaking && !boyContainer.classList.contains('exit')) {
+                        boyContainer.classList.remove('speaking'); 
+                    }
+                }, 2000);
+            };
+
+            try {
+                window.speechSynthesis.speak(utterance);
+            } catch(e) {
+                console.log("Audio autoplay blocked by browser.");
+            }
+        }
+
+        function explain(plantKey) {
+            clearTimeout(typeTimer);
+            window.speechSynthesis.cancel();
+
+            bubble.innerHTML = ""; 
+            boyContainer.classList.add('speaking');
+            const fullText = plantFacts[plantKey];
+            let index = 0;
+
+            speakText(fullText);
+
+            function typeWriter() {
+                if (index <= fullText.length) {
+                    bubble.innerHTML = fullText.substring(0, index);
+                    index++;
+                    bubble.scrollTop = bubble.scrollHeight;
+                    typeTimer = setTimeout(typeWriter, 20); // Faster typing on mobile
+                }
+            }
+            typeWriter();
+        }
+
+        window.onclick = function(e) {
+            handleFirstClick(); 
+            if (!e.target.matches('.eagle-trigger')) {
+                document.getElementById('eagle-menu').classList.remove('show');
+                eagleBubbleNav.style.opacity = '1'; 
+            }
+        }
+    </script>
+</body>
+</html>
